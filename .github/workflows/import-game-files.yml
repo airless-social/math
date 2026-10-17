@@ -1,0 +1,64 @@
+name: import game pages and assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-game-files.yml"
+      - "index.html"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-game-files
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out CXShelf
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download and extract game archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            https://github.com/retrobowl25/retrobowl25.github.io/archive/refs/heads/main.zip \
+            --output /tmp/game-source.zip
+          mkdir -p /tmp/game-source
+          unzip -q /tmp/game-source.zip -d /tmp/game-source
+          SRC="$(find /tmp/game-source -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+          test -n "$SRC"
+          # Import the game-page HTML files, shared page assets, and site theme assets.
+          find "$SRC" -maxdepth 1 -type f -name '*.html' ! -name 'index.html' -exec cp -f {} . \;
+          if [ -d "$SRC/upload" ]; then
+            mkdir -p upload
+            cp -a "$SRC/upload/." upload/
+          fi
+          if [ -d "$SRC/themes" ]; then
+            mkdir -p themes
+            cp -a "$SRC/themes/." themes/
+          fi
+          echo "Imported HTML pages: $(find "$SRC" -maxdepth 1 -type f -name '*.html' ! -name 'index.html' | wc -l)"
+          echo "Imported upload assets: $(find upload -type f 2>/dev/null | wc -l)"
+
+      - name: Commit imported game files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          find . -maxdepth 1 -type f -name '*.html' ! -name 'index.html' -print0 | xargs -0 -r git add --
+          git add -- upload themes 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No game-file changes to commit."
+          else
+            git commit -m "Add archived game pages and their assets"
+            git push origin HEAD:main
+          fi
