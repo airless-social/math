@@ -1632,6 +1632,11 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncNavThu
  const paint=()=>{display.textContent=shown;expression.textContent=op&&first!==null?String(first)+' '+({add:'+',subtract:'−',multiply:'×',divide:'÷'}[op]||''):' '};
  function revealShelf(){
    // Open synchronously on the equals-button tap, then construct the page in the blank tab.
+   // Build the destination from this deployment so forks and custom domains work too.
+   const target=new URL(window.location.href);
+   target.searchParams.set('runner','1');
+   target.hash='';
+   const targetUrl=target.href;
    const w=window.open('about:blank','_blank');
    if(!w){ expression.textContent='Safari blocked the tab. Allow pop-ups for this site and try again.'; return; }
    try {
@@ -1639,10 +1644,10 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncNavThu
      w.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>New Tab</title><style>html,body{margin:0;width:100%;height:100%;background:#111}iframe{display:block;width:100%;height:100%;height:100dvh;border:0;background:#fff}</style></head><body><iframe title="Website" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write" allowfullscreen></iframe></body></html>');
      w.document.close();
      const frame=w.document.querySelector('iframe');
-     frame.src='https://cxshelf.github.io/?runner=1';
+     frame.src=targetUrl;
    } catch(err) {
-     // If Safari won't let the opener populate the blank page, navigate that tab to the shelf.
-     try { w.location.href='https://cxshelf.github.io/?runner=1'; } catch(e) { expression.textContent='Could not open the shelf. Try opening CXShelf directly in Safari.'; }
+     // If Safari won't let the opener populate the blank page, navigate that tab to this deployment.
+     try { w.location.href=targetUrl; } catch(e) { expression.textContent='Could not open this site. Try opening it directly in your browser.'; }
    }
  }
  function number(n){if(replaceNext){shown=n==='.'?'0.':n;replaceNext=false}else if(n==='.'&&!shown.includes('.'))shown+='.';else if(n!=='.')shown=shown==='0'?n:shown+n;paint();}
