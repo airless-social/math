@@ -683,6 +683,14 @@ const GAMES = [
     isPopular:false, isMega:false, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
   { id:"3d-car-simulator", title:"3D Car Simulator", tagline:"Get behind the wheel and drive.", desc:"A 3D driving sandbox for cruising around and getting a feel for the car controls.", url:"https://cxshelf.github.io/games/3d-car-simulator/", image:"https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/3D-Car-Simulator/3D-Car-Simulator.png", tags:["Driving","Cars","Simulator"], platforms:["PC"], hue:[24,70,48],
     isPopular:false, isMega:false, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"8-ball-billiards-classic", title:"8 Ball Billiards Classic", tagline:"Line up the shot and clear the table.", desc:"Play a classic 8-ball pool game with aiming, positioning, and pocket shots.", url:"https://cxshelf.github.io/games/8-ball-billiards-classic/", image:"https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/8-Ball-Billiards-Classic/8-Ball-Billiards-Classic.png", tags:["Sports","Pool","Casual"], platforms:["PC","Mobile"], hue:[24,70,48],
+    isPopular:false, isMega:false, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"a-dance-of-fire-and-ice", title:"A Dance of Fire and Ice", tagline:"Follow the rhythm, stay on beat.", desc:"Guide two orbiting planets along a winding path by keeping precise timing with the music.", url:"https://cxshelf.github.io/games/a-dance-of-fire-and-ice/", image:"https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/A-Dance-of-Fire-and-Ice/A-Dance-of-Fire-and-Ice.png", tags:["Rhythm","Music","Precision"], platforms:["PC","Mobile"], hue:[24,70,48],
+    isPopular:false, isMega:false, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"a-game-about-feeding-a-black-hole", title:"A Game About Feeding A Black Hole", tagline:"Feed the void. Grow the black hole.", desc:"A casual incremental game about feeding objects into a black hole and growing its power.", url:"https://cxshelf.github.io/games/a-game-about-feeding-a-black-hole/", image:"https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/A-Game-About-Feeding-A-Black-Hole/A-Game-About-Feeding-A-Black-Hole.png", tags:["Idle","Incremental","Casual"], platforms:["PC","Mobile"], hue:[24,70,48],
+    isPopular:false, isMega:false, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
+  { id:"achievement-unlocked-3", title:"Achievement Unlocked 3", tagline:"Collect achievements for everything.", desc:"A platforming challenge where the goal is to unlock a huge collection of achievements.", url:"https://cxshelf.github.io/games/achievement-unlocked-3/", image:"https://raw.githubusercontent.com/UBGHyper/GameList.github.io/main/Achievement-Unlocked-3/achievementunlocked3.png", tags:["Platformer","Arcade","Flash"], platforms:["PC"], hue:[24,70,48],
+    isPopular:false, isMega:false, isTrending:false, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:false, isEarlyAccess:false, isOnSale:false, isExclusive:false },
   { id:"Iconicc-Launcher", title:"Iconicc Launcher", tagline:"Web Minecraft", desc:"Play Minecraft online unblocked.", url:"https://iconicclauncher.github.io/iconicclauncher/", image:"https://i.ibb.co/GyP2bf5/Untitled-design.png", tags:["Open World","Multiplayer"], platforms:["PC","Mobile","iOS"], hue:[18,100,54],
     isPopular:true, isBessa:true, isTrending:true, isUpcoming:false, isNew:false, isSubscribersOnly:false, isFree:false, isMultiplayer:true, isEarlyAccess:false, isOnSale:false, isExclusive:false },
   { id:"Stack", title:"Block Stacker", tagline:"A classic game.", desc:"Stack the blocks to beat your high score.", url:"https://codepen.io/HunorMarton/full/MWjBRWp", image:"https://i.ibb.co/NdfV4khV/Stack.png", tags:["Classic","Timing"], platforms:["PC","Mobile","iOS"], hue:[265,60,42],
@@ -949,10 +957,21 @@ function renderRoute(){
     sorter.style.cssText = "margin-left:auto;background:var(--raised);color:var(--ink);border:1px solid var(--line-2);border-radius:999px;padding:9px 13px;font:inherit;cursor:pointer";
     [["az","A–Z"],["za","Z–A"]].forEach(([value,label])=>{const option=document.createElement("option");option.value=value;option.textContent=label;sorter.appendChild(option);});
     controls.append(heading,sorter);
+    const allSection = el("section","section empty-guard");
     const grid = el("div","section-grid");
-    const draw = () => { grid.innerHTML=""; const sorted=[...GAMES].sort((a,b)=>a.title.localeCompare(b.title,undefined,{sensitivity:"base"})); if(sorter.value==="za") sorted.reverse(); sorted.forEach((g,i)=>{const tile=tileNode(g);tile.style.transitionDelay=Math.min(i,8)*20+"ms";grid.appendChild(tile);}); };
-    sorter.addEventListener("change",draw); draw();
-    rows.append(controls,grid);
+    const count = el("span","count",GAMES.length+" titles");
+    controls.appendChild(count);
+    const draw = () => {
+      grid.innerHTML = "";
+      const sorted = [...GAMES].sort((a,b)=>a.title.localeCompare(b.title,undefined,{sensitivity:"base"}));
+      if(sorter.value === "za") sorted.reverse();
+      sorted.forEach((g,i)=>{const tile=tileNode(g);tile.style.transitionDelay=Math.min(i,8)*20+"ms";grid.appendChild(tile);});
+    };
+    sorter.addEventListener("change",draw);
+    allSection.appendChild(grid);
+    rows.append(controls,allSection);
+    draw();
+    revealObserver.observe(allSection);
     return;
   }
 
