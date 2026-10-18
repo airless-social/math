@@ -504,6 +504,7 @@ img,svg{display:block;max-width:100%}
   <nav class="links" id="navLinks">
     <span class="nav-thumb" id="navThumb" aria-hidden="true"></span>
     <a href="#" data-nav="home" class="on">Home</a>
+    <a href="#" data-nav="all">All</a>
     <a href="#" data-nav="favorites">Favorites</a>
     <a href="#" data-nav="playlist">Playlist</a>
   </nav>
@@ -589,6 +590,7 @@ img,svg{display:block;max-width:100%}
 <nav class="bottomnav">
   <span class="nav-thumb-b" id="navThumbB" aria-hidden="true"></span>
   <button data-nav="home" class="on"><svg class="ico"><use href="#i-home"/></svg>Home</button>
+  <button data-nav="all"><svg class="ico"><use href="#i-search"/></svg>All</button>
   <button data-nav="favorites"><svg class="ico"><use href="#i-heart"/></svg>Favorites</button>
   <button data-nav="playlist"><svg class="ico"><use href="#i-list"/></svg>Playlist</button>
   <button data-nav="account" id="mobileAccountNav" aria-label="Sign in or profile"><span class="nav-avatar-wrap"><svg class="ico" id="mobileAccountIcon"><use href="#i-user"/></svg><img class="nav-avatar" id="mobileProfilePhoto" alt="" hidden></span><span id="mobileAccountLabel">Sign in</span></button>
@@ -931,6 +933,20 @@ function renderRoute(){
   if (state.route === "playlist"){
     const games = state.playlist.map(byId).filter(Boolean);
     rows.appendChild(section("Your playlist", "i-list", games) || emptyNote("Your playlist is empty. Open a game and add it from there."));
+    return;
+  }
+  if (state.route === "all"){
+    const controls = el("div","section-head");
+    const heading = el("h2"); heading.textContent = "All games";
+    const sorter = document.createElement("select");
+    sorter.id = "allSort"; sorter.setAttribute("aria-label","Sort games");
+    sorter.style.cssText = "margin-left:auto;background:var(--raised);color:var(--ink);border:1px solid var(--line-2);border-radius:999px;padding:9px 13px;font:inherit;cursor:pointer";
+    [["az","A–Z"],["za","Z–A"]].forEach(([value,label])=>{const option=document.createElement("option");option.value=value;option.textContent=label;sorter.appendChild(option);});
+    controls.append(heading,sorter);
+    const grid = el("div","section-grid");
+    const draw = () => { grid.innerHTML=""; const sorted=[...GAMES].sort((a,b)=>a.title.localeCompare(b.title,undefined,{sensitivity:"base"})); if(sorter.value==="za") sorted.reverse(); sorted.forEach((g,i)=>{const tile=tileNode(g);tile.style.transitionDelay=Math.min(i,8)*20+"ms";grid.appendChild(tile);}); };
+    sorter.addEventListener("change",draw); draw();
+    rows.append(controls,grid);
     return;
   }
 
